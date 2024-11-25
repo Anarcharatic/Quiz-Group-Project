@@ -1,5 +1,6 @@
 import json
 import customtkinter
+import random
 
 with open("users.json", "r") as f:
     userFile = json.loads(f.read())
@@ -24,33 +25,122 @@ def mainMenu(root, currentUser):
     mainTitle = customtkinter.CTkLabel(root, text="MAIN MENU", font=("Arial", 30))
     mainTitle.pack(pady=10)
 
-    quizButton = customtkinter.CTkButton(root, text="Take a quiz", cursor="hand2", font=("Arial", 18), command=lambda: quizMenu(root))
+    quizButton = customtkinter.CTkButton(root, text="Take a quiz", cursor="hand2", font=("Arial", 18), command=lambda: quizMenu(root, currentUser))
     quizButton.pack(pady=10)
 
-    quitButton = customtkinter.CTkButton(root, text="Quit", command=root.destroy, cursor="hand2", font=("Arial", 18)).pack(pady=10)
+    quitButton = customtkinter.CTkButton(root, text="Quit", command=root.destroy, cursor="hand2", font=("Arial", 18))
     quitButton.pack(pady=10)
 
-def quizMenu(root):
+def quizMenu(root, currentUser):
 
     clearScreen(root)
 
-    mainTitle = customtkinter.CTkLabel(root, text="Quizzes", font=("Arial", 30))
+    mainTitle = customtkinter.CTkLabel(root, text="QUIZZES", font=("Arial", 30))
     mainTitle.pack(pady=10)
 
     selectLabel = customtkinter.CTkLabel(root, text="Select a difficulty:", font=("Arial", 18))
     selectLabel.pack(pady=10)
 
-    easyButton = customtkinter.CTkButton(root, text="Easy", cursor="hand2", font=("Arial", 18), command=lambda: generateQuiz(root, "easy"))
+    easyButton = customtkinter.CTkButton(root, text="Easy", cursor="hand2", font=("Arial", 18), command=lambda: generateQuiz(root, currentUser, "easy", 2))
     easyButton.pack(pady=10)
 
-    mediumButton = customtkinter.CTkButton(root, text="Medium", cursor="hand2", font=("Arial", 18), command=lambda: generateQuiz(root, "medium"))
+    mediumButton = customtkinter.CTkButton(root, text="Medium", cursor="hand2", font=("Arial", 18), command=lambda: generateQuiz(root, currentUser, "medium", 3))
     mediumButton.pack(pady=10)
 
-    hardButton = customtkinter.CTkButton(root, text="Hard", cursor="hand2", font=("Arial", 18), command=lambda: generateQuiz(root, "hard"))
+    hardButton = customtkinter.CTkButton(root, text="Hard", cursor="hand2", font=("Arial", 18), command=lambda: generateQuiz(root, currentUser, "hard", 4))
     hardButton.pack(pady=10)
 
-def generateQuiz(root, difficulty):
-    pass
+    backButton = customtkinter.CTkButton(root, text="Go Back", cursor="hand2", font=("Arial", 18), command=lambda: mainMenu(root, currentUser))
+    backButton.pack(pady=10)
+
+def generateQuiz(root, currentUser, difficulty, options):
+
+    mainTitle = customtkinter.CTkLabel(root, text=f"{difficulty.upper()} QUIZ", font=("Arial", 30))
+    mainTitle.pack(pady=10)
+
+    with open("mathsquestions.json", "r") as f:
+        questionsList = json.loads(f.read())
+    
+    difficultyQuestions = questionsList[difficulty]
+    questions = random.sample(list(difficultyQuestions.items()), 5)
+
+    currentQuestion = 0
+    correctAnswers = 0
+    incorrectAnswers = 0
+
+    def displayQuestion():
+        nonlocal currentQuestion
+        if currentQuestion < len(questions):
+            question, questionInfo = questions[currentQuestion]
+
+            clearScreen(root)
+
+            questionLabel = customtkinter.CTkLabel(root, text=f"Question {currentQuestion + 1}: {questionInfo[0]}", font=("Arial", 30))
+            questionLabel.pack(pady=10)
+
+            questionOptions = [questionInfo[1]]
+
+            for _ in range(1, options):
+                questionOptions.append(questionInfo[1] + random.randint(1, 50))
+
+            random.shuffle(questionOptions)
+
+            radio_var = customtkinter.StringVar()
+
+            for option in questionOptions:
+                optionButton = customtkinter.CTkRadioButton(root, text=f"{option}", value=option, variable=radio_var)
+                optionButton.pack(pady=10)
+
+            submitButton = customtkinter.CTkButton(root, text="Submit", cursor="hand2", font=("Arial", 18), command=lambda: processResult(radio_var.get(), questionInfo[1]))
+            submitButton.pack(pady=10)
+
+    def processResult(userAnswer, correctAnswer):
+        nonlocal currentQuestion, correctAnswers, incorrectAnswers
+        if userAnswer == str(correctAnswer):
+            correctAnswers += 1
+        else:
+            incorrectAnswers += 1
+        currentQuestion += 1
+        if currentQuestion == 5:
+            resultScreen()
+            return
+        displayQuestion()
+
+    def calculateGrade(correctAnswers):
+        if correctAnswers == 5:
+            return "A*"
+        elif correctAnswers == 4:
+            return "A"
+        elif correctAnswers == 3:
+            return "B"
+        elif correctAnswers == 2:
+            return "C"
+        elif correctAnswers == 1:
+            return "D"
+        else:
+            return "F"
+
+    def resultScreen():
+        nonlocal correctAnswers, difficulty, currentUser
+
+        clearScreen(root)
+
+        scoreLabel = customtkinter.CTkLabel(root, text=f"Score: {correctAnswers}/5", font=("Arial", 18))
+        scoreLabel.pack(pady=10)
+
+        percentageLabel = customtkinter.CTkLabel(root, text=f"Percentage: {round((correctAnswers/5) * 100)}", font=("Arial", 18))
+        percentageLabel.pack(pady=10)
+
+        grade = calculateGrade(correctAnswers)
+
+        gradeLabel = customtkinter.CTkLabel(root, text=f"Grade: {grade}", font=("Arial", 18))
+        gradeLabel.pack(pady=10)
+
+        backButton = customtkinter.CTkButton(root, text="Return to main menu", cursor="hand2", font=("Arial", 18), command=lambda: mainMenu(root, currentUser))
+        backButton.pack(pady=10)
+
+    displayQuestion()
+
 
 def loginScreen(root):
 

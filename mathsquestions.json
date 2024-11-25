@@ -1,0 +1,22 @@
+{
+    "easy": {
+        "question1": ["27 + 64", 91],
+        "question2": ["54 - 15", 39],
+        "question3": ["6 x 9", 54],
+        "question4": ["121 / 11", 11],
+        "question5": ["Write 1/2 as a decimal", 0.5],
+        "question6": ["44 + 66", 110],
+        "question7": ["10 x 10", 100],
+        "question8": ["25 - 23", 2],
+        "question9": ["4 x 5", 20],
+        "question10": ["48 / 4", 12]
+    },
+
+    "medium": {
+
+    },
+
+    "hard": {
+
+    }
+}

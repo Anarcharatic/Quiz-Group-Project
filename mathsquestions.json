@@ -13,10 +13,28 @@
     },
 
     "medium": {
-
+        "question1": ["Calculate the sum of 123 and 456.", 579],
+        "question2": ["What is 5% of 200?", 10],
+        "question3": ["Subtract 98 from 431", 333],
+        "question4": ["288 / 12", 24],
+        "question5": ["A rectangle has a length of 10 cm and a width of 7 cm. What is the area (cm²)?", 70],
+        "question6": ["Convert 50 kilograms to grams", 50000],
+        "question7": ["If a train travels 120 kilometers in 2 hours, what is its average speed (km/h)?", 60],
+        "question8": ["Find the product of 13 and 9.", 117],
+        "question9": ["If there are 180 students in Year 7 and 40% of them are girls, how many girls are there?", 72],
+        "question10": ["Solve for x: x + 10 = 14", 4]
     },
 
     "hard": {
-
+        "question1": ["A box contains red, blue, and green balls in the ratio 2:3:4. If there are 45 green balls, how many balls are there in total?", 81],
+        "question2": ["If 5^x = 125, what is the value of x?", 3],
+        "question3": ["Calculate the discriminant of the quadratic equation x^2 - 4x + 4 = 0", 0],
+        "question4": ["A circle has a circumference of 31.4 cm. Find its radius to the nearest integer.", 5],
+        "question5": ["Write 1/2 as a decimal", 0.5],
+        "question6": ["What is the largest x-intercept in this equation: f(x) = x^2 - 9x + 14", 7],
+        "question7": ["How many terms are in the arithmetic sequence 5, 11, 17, ..., 101?", 17],
+        "question8": ["A cylinder has a height of 10 cm and a radius of 3 cm. Calculate its volume to the nearest integer.", 283],
+        "question9": ["Solve for x: 5x - 3 = 2x + 12", 5],
+        "question10": ["Find the x-coordinate of the vertex of the parabola given by the equation: y = x^2 - 4x + 3", 2]
     }
 }

@@ -16,7 +16,7 @@ def clearScreen(root): #Subroutine used to clear the screen so new elements can 
     for i in root.winfo_children():
         i.destroy()
 
-#Functions
+#Main menu funtion
 
 def mainMenu(root, currentUser):
 
@@ -28,8 +28,166 @@ def mainMenu(root, currentUser):
     quizButton = customtkinter.CTkButton(root, text="Take a quiz", cursor="hand2", font=("Arial", 18), command=lambda: quizMenu(root, currentUser))
     quizButton.pack(pady=10)
 
+    profileButton = customtkinter.CTkButton(root, text="View Profile", cursor="hand2", font=("Arial", 18), command=lambda: viewProfile(root, currentUser))
+    profileButton.pack(pady=10)
+
+    quizInfoButton = customtkinter.CTkButton(root, text="Quiz Information", cursor="hand2", font=("Arial", 18), command=lambda: quizInfo(root, currentUser))
+    quizInfoButton.pack(pady=10)
+
+    difficultyInfoButton = customtkinter.CTkButton(root, text="Difficulty Information", cursor="hand2", font=("Arial", 18), command=lambda: difficultyInfo(root, currentUser))
+    difficultyInfoButton.pack(pady=10)
+
     quitButton = customtkinter.CTkButton(root, text="Quit", command=root.destroy, cursor="hand2", font=("Arial", 18))
     quitButton.pack(pady=10)
+
+#Functions used for seeing the difficulty information
+
+def difficultyInfo(root, currentUser):
+    
+    clearScreen(root)
+
+    mainTitle = customtkinter.CTkLabel(root, text="DIFFICULTY INFORMATION", font=("Arial", 30))
+    mainTitle.pack(pady=10)
+
+    selectLabel = customtkinter.CTkLabel(root, text="Select a difficulty:", font=("Arial", 18))
+    selectLabel.pack(pady=10)
+
+    easyButton = customtkinter.CTkButton(root, text="Easy", cursor="hand2", font=("Arial", 18), command=lambda: getDifficultyInfo(root, currentUser, "easy"))
+    easyButton.pack(pady=10)
+
+    mediumButton = customtkinter.CTkButton(root, text="Medium", cursor="hand2", font=("Arial", 18), command=lambda: getDifficultyInfo(root, currentUser, "medium"))
+    mediumButton.pack(pady=10)
+
+    hardButton = customtkinter.CTkButton(root, text="Hard", cursor="hand2", font=("Arial", 18), command=lambda: getDifficultyInfo(root, currentUser, "hard"))
+    hardButton.pack(pady=10)
+
+    backButton = customtkinter.CTkButton(root, text="Go Back", cursor="hand2", font=("Arial", 18), command=lambda: mainMenu(root, currentUser))
+    backButton.pack(pady=10)
+
+def getDifficultyInfo(root, currentUser, difficulty):
+
+    clearScreen(root)
+
+    mainTitle = customtkinter.CTkLabel(root, text="DIFFICULTY INFORMATION", font=("Arial", 30))
+    mainTitle.pack(pady=10)
+
+    numberQuizzesTaken = 0
+    totalScore = 0
+    bestScore = 0
+    bestScorer = ""
+    
+    for user, userDetails in userFile.items():
+        for quiz in userDetails["quizzes"].values():
+            if quiz["quizDifficulty"] == difficulty:
+                numberQuizzesTaken += 1
+                totalScore += quiz["quizScore"]
+                if quiz["quizScore"] > bestScore:
+                    bestScore = quiz["quizScore"]
+                    bestScorer = user
+
+    if numberQuizzesTaken > 0:
+
+        quizzesLabel = customtkinter.CTkLabel(root, text=f"Number of {difficulty} quizzes taken: {numberQuizzesTaken}", font=("Arial", 18))
+        quizzesLabel.pack(pady=10)
+
+        averageScoreLabel = customtkinter.CTkLabel(root, text=f"Average score: {round(totalScore / numberQuizzesTaken, 2)}/5", font=("Arial", 18))
+        averageScoreLabel.pack(pady=10)
+
+        highestScoreLabel = customtkinter.CTkLabel(root, text=f"Best score: {bestScore}/5", font=("Arial", 18))
+        highestScoreLabel.pack(pady=10)
+
+        bestScorerLabel = customtkinter.CTkLabel(root, text=f"Best score achieved by: {bestScorer}", font=("Arial", 18))
+        bestScorerLabel.pack(pady=10)
+
+        backButton = customtkinter.CTkButton(root, text="Go Back", cursor="hand2", font=("Arial", 18), command=lambda: mainMenu(root, currentUser))
+        backButton.pack(pady=10)
+
+    else:
+
+        noneTakenLabel = customtkinter.CTkLabel(root, text=f"There have been no tests taken of this difficulty so far.", font=("Arial", 18))
+        noneTakenLabel.pack(pady=10)
+
+        backButton = customtkinter.CTkButton(root, text="Go Back", cursor="hand2", font=("Arial", 18), command=lambda: mainMenu(root, currentUser))
+        backButton.pack(pady=10)
+
+#Functions used for seeing the quiz information
+
+def quizInfo(root, currentUser):
+
+    clearScreen(root)
+
+    mainTitle = customtkinter.CTkLabel(root, text="QUIZ INFORMATION", font=("Arial", 30))
+    mainTitle.pack(pady=10)
+
+    usernameEntry = customtkinter.CTkEntry(root, placeholder_text="Enter a username")
+    usernameEntry.pack(pady=10)
+
+    statusMessage = customtkinter.CTkLabel(root, text="", font=("Arial", 18), text_color="red")
+    statusMessage.pack(pady=10)
+
+    submitButton = customtkinter.CTkButton(root, text="Submit", cursor="hand2", font=("Arial", 18), command=lambda: getQuizInfo(root, currentUser, usernameEntry.get(), statusMessage))
+    submitButton.pack(pady=10)
+
+    backButton = customtkinter.CTkButton(root, text="Go Back", cursor="hand2", font=("Arial", 18), command=lambda: mainMenu(root, currentUser))
+    backButton.pack(pady=10)
+
+def getQuizInfo(root, currentUser, usernameEntry, statusMessage):
+    
+    if usernameEntry not in userFile:
+        statusMessage.configure(text="You did not enter in a valid username. Please try again.")
+
+    else:
+
+        clearScreen(root)
+
+        mainTitle = customtkinter.CTkLabel(root, text=f"{userFile[usernameEntry]['username']}'s Quizzes", font=("Arial", 30))
+        mainTitle.pack(pady=10)
+
+        quizzesLabel = customtkinter.CTkLabel(root, text=f"Number of quizzes taken: {userFile[currentUser]['quizzesTaken']}", font=("Arial", 18))
+        quizzesLabel.pack(pady=10)
+
+        quizFrame = customtkinter.CTkScrollableFrame(root)
+
+        index = 0
+
+        for quiz, value in userFile[currentUser]["quizzes"].items():
+            quizInfoLabel = customtkinter.CTkLabel(quizFrame, text=f"{quiz}: Grade: {value['quizGrade']}, Difficulty: {value['quizDifficulty']}")
+            quizInfoLabel.grid(row=index, column=0, pady=5)
+            index += 1
+
+        quizFrame.pack(pady=10)
+
+        backButton = customtkinter.CTkButton(root, text="Go Back", cursor="hand2", font=("Arial", 18), command=lambda: mainMenu(root, currentUser))
+        backButton.pack(pady=10)
+
+#Function used for viewing the user profile
+
+def viewProfile(root, currentUser):
+    
+    clearScreen(root)
+
+    mainTitle = customtkinter.CTkLabel(root, text="VIEW PROFILE", font=("Arial", 30))
+    mainTitle.pack(pady=10)
+
+    usernameLabel = customtkinter.CTkLabel(root, text=f"Username: {currentUser}", font=("Arial", 18))
+    usernameLabel.pack(pady=10)
+
+    realNameLabel = customtkinter.CTkLabel(root, text=f"Name: {userFile[currentUser]['realName']}", font=("Arial", 18))
+    realNameLabel.pack(pady=10)
+
+    ageLabel = customtkinter.CTkLabel(root, text=f"Age: {userFile[currentUser]['age']}", font=("Arial", 18))
+    ageLabel.pack(pady=10)
+
+    quizzesLabel = customtkinter.CTkLabel(root, text=f"Number of quizzes taken: {userFile[currentUser]['quizzesTaken']}", font=("Arial", 18))
+    quizzesLabel.pack(pady=10)
+
+    moreInfoLabel = customtkinter.CTkLabel(root, text=f"To view more information about a specific users quizzes, use the Quiz Information button in the main menu.", font=("Arial", 18))
+    moreInfoLabel.pack(pady=10)
+
+    backButton = customtkinter.CTkButton(root, text="Go Back", cursor="hand2", font=("Arial", 18), command=lambda: mainMenu(root, currentUser))
+    backButton.pack(pady=10)
+
+#Functions used for the user taking the quiz
 
 def quizMenu(root, currentUser):
 
@@ -55,27 +213,28 @@ def quizMenu(root, currentUser):
 
 def generateQuiz(root, currentUser, difficulty, options):
 
-    mainTitle = customtkinter.CTkLabel(root, text=f"{difficulty.upper()} QUIZ", font=("Arial", 30))
-    mainTitle.pack(pady=10)
-
     with open("mathsquestions.json", "r") as f:
         questionsList = json.loads(f.read())
     
     difficultyQuestions = questionsList[difficulty]
-    questions = random.sample(list(difficultyQuestions.items()), 5)
+    questions = random.sample(list(difficultyQuestions.items()), 5) #Takes 5 random questions from the mathsquestions.json file of the specified difficulty
 
     currentQuestion = 0
     correctAnswers = 0
     incorrectAnswers = 0
 
-    def displayQuestion():
+    def displayQuestion(progress):
         nonlocal currentQuestion
-        if currentQuestion < len(questions):
+
+        if progress is True and currentQuestion < len(questions):
             question, questionInfo = questions[currentQuestion]
 
             clearScreen(root)
 
-            questionLabel = customtkinter.CTkLabel(root, text=f"Question {currentQuestion + 1}: {questionInfo[0]}", font=("Arial", 30))
+            mainTitle = customtkinter.CTkLabel(root, text=f"{difficulty.upper()} QUIZ", font=("Arial", 30))
+            mainTitle.pack(pady=10)
+
+            questionLabel = customtkinter.CTkLabel(root, text=f"Question {currentQuestion + 1}: {questionInfo[0]}", font=("Arial", 20))
             questionLabel.pack(pady=10)
 
             questionOptions = [questionInfo[1]]
@@ -91,20 +250,27 @@ def generateQuiz(root, currentUser, difficulty, options):
                 optionButton = customtkinter.CTkRadioButton(root, text=f"{option}", value=option, variable=radio_var)
                 optionButton.pack(pady=10)
 
-            submitButton = customtkinter.CTkButton(root, text="Submit", cursor="hand2", font=("Arial", 18), command=lambda: processResult(radio_var.get(), questionInfo[1]))
+            statusMessage = customtkinter.CTkLabel(root, text="", font=("Arial", 18), text_color="red")
+            statusMessage.pack(pady=10)
+
+            submitButton = customtkinter.CTkButton(root, text="Submit", cursor="hand2", font=("Arial", 18), command=lambda: processResult(radio_var.get(), questionInfo[1], statusMessage))
             submitButton.pack(pady=10)
 
-    def processResult(userAnswer, correctAnswer):
+    def processResult(userAnswer, correctAnswer, statusMessage):
         nonlocal currentQuestion, correctAnswers, incorrectAnswers
-        if userAnswer == str(correctAnswer):
-            correctAnswers += 1
+        if userAnswer:
+            if userAnswer == str(correctAnswer):
+                correctAnswers += 1
+            else:
+                incorrectAnswers += 1
+            currentQuestion += 1
+            if currentQuestion == 5:
+                resultScreen()
+                return
+            displayQuestion(True)
         else:
-            incorrectAnswers += 1
-        currentQuestion += 1
-        if currentQuestion == 5:
-            resultScreen()
-            return
-        displayQuestion()
+            statusMessage.configure(text="You did not select a valid option. Please try again.")
+            displayQuestion(False)
 
     def calculateGrade(correctAnswers):
         if correctAnswers == 5:
@@ -136,11 +302,36 @@ def generateQuiz(root, currentUser, difficulty, options):
         gradeLabel = customtkinter.CTkLabel(root, text=f"Grade: {grade}", font=("Arial", 18))
         gradeLabel.pack(pady=10)
 
+        quizName = "quiz"
+        uniqueQuiz = False
+        index = 1
+
+        while uniqueQuiz is False: #While loop to create a unique quiz name
+            quizName = f"{quizName}{index}"
+            if quizName in userFile[currentUser]["quizzes"]:
+                index += 1
+                quizName = "quiz"
+            else:
+                uniqueQuiz = True
+
+        userFile[currentUser]["quizzes"].update({quizName: {
+            "quizDifficulty": difficulty,
+            "quizScore": correctAnswers,
+            "quizGrade": grade
+        }})
+
+        userFile[currentUser]["quizzesTaken"] += 1
+
+        quizName = "quiz" #Resets the quiz name in case they decide to take another quiz, so a new name can be generated
+
+        saveUserData()
+
         backButton = customtkinter.CTkButton(root, text="Return to main menu", cursor="hand2", font=("Arial", 18), command=lambda: mainMenu(root, currentUser))
         backButton.pack(pady=10)
 
-    displayQuestion()
+    displayQuestion(True)
 
+#Functions used for the user login
 
 def loginScreen(root):
 
@@ -175,6 +366,8 @@ def userLogin(username, password, statusMessage, root):
     else:
         statusMessage.configure(text="Logging in...")
         mainMenu(root, username)
+
+#Functions used for signing up the user
 
 def signUpScreen(root):
 

@@ -240,7 +240,12 @@ def generateQuiz(root, currentUser, difficulty, options):
             questionOptions = [questionInfo[1]]
 
             for _ in range(1, options):
-                questionOptions.append(questionInfo[1] + random.randint(1, 50))
+                validNumber = False
+                while validNumber == False:
+                    randomNumber = random.randint(-10, 10)
+                    if randomNumber not in questionOptions: #Exclude answers that are the same value as the correct answer or other incorrect answers
+                        questionOptions.append(questionInfo[1] + randomNumber)
+                        validNumber = True
 
             random.shuffle(questionOptions)
 
@@ -290,6 +295,9 @@ def generateQuiz(root, currentUser, difficulty, options):
         nonlocal correctAnswers, difficulty, currentUser
 
         clearScreen(root)
+
+        mainTitle = customtkinter.CTkLabel(root, text="QUIZ RESULTS", font=("Arial", 30))
+        mainTitle.pack(pady=10)
 
         scoreLabel = customtkinter.CTkLabel(root, text=f"Score: {correctAnswers}/5", font=("Arial", 18))
         scoreLabel.pack(pady=10)
@@ -472,6 +480,6 @@ if __name__ == "__main__":
 
     root = customtkinter.CTk() #Creates the customtkinter window
     root.geometry("1440x900")
-    root.title("OCRtunes")
+    root.title("Maths Quiz")
     
     main(root)
